@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# cron script to save a backup copy of rootfs to a folder.
+#
+# Written by Mitchell Overdick <mwsoverdick@gmail.com>.
+#
+
+# backup type (update.sh expects $BACKUP_TYPE to be here)
+if [[ -z $1 ]]; then
+	TYPE=$BACKUP_TYPE
+else
+	TYPE=$1
+fi
+
+# backup folder
+FOLDER="/media/750GB/pi/backups/"
+
+# Echo message
+echo -e "Running ${TYPE} system backup to ${FOLDER}${TYPE}"
+
+# Create folder for backup type if it doesn't exist
+mkdir -p $FOLDER$TYPE
+
+# Run backups
+rsync -aAXv --delete --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} / $FOLDER$TYPE
+
+# Add timestamp to backups log
+echo -e "$(date) [${TYPE^^}]" >> ${FOLDER}backups.log
